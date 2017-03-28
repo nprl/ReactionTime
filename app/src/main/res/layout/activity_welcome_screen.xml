@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.arsh.reactiontime.WelcomeScreen">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="240dp"
+        android:text="Cond:"
+        android:textSize="32dp" />
+
+
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:weightSum="1">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <TextView
+        android:text="Name/ID:"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:textSize="32dp"
+        android:id="@+id/textView" />
+
+
+    <EditText
+        android:text = "S01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginLeft="150dp"
+        android:textSize="36dp"
+        android:id="@+id/editText" />
+
+    <TextView
+        android:text="Visit #"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="120dp"
+        android:textSize="32dp"
+        android:id="@+id/visit" />
+
+    <EditText
+        android:text = "1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="112dp"
+        android:layout_marginLeft="150dp"
+        android:textSize="36dp"
+        android:id="@+id/editVisit" />
+
+    <EditText
+        android:text = "PRE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="170dp"
+        android:layout_marginLeft="150dp"
+        android:textSize="36dp"
+        android:id="@+id/editStage" />
+
+    <TextView
+        android:text="Stage:"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="180dp"
+        android:textSize="32dp"
+        android:id="@+id/stage" />
+
+    <EditText
+        android:text = "TESTR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="230dp"
+        android:layout_marginLeft="150dp"
+        android:textSize="36dp"
+        android:id="@+id/editCond" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        android:clickable="true"
+        android:onClick="@string/title_activity_ready_screen" />
+
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="300dp"
+        android:text="Layout:"
+        android:textSize="32dp" />
+
+    <RadioGroup
+        android:id="@+id/radioLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="310dp"
+        android:layout_marginLeft="160dp">
+
+        <RadioButton
+            android:id="@+id/radioRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="row"
+            android:onClick="onLayoutClicked"/>
+
+        <RadioButton
+            android:id="@+id/radioArc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="arc"
+            android:onClick="onLayoutClicked"/>
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="360dp"
+        android:text="Size:"
+        android:textSize="32dp" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="370dp"
+        android:layout_marginLeft="160dp">
+
+        <RadioButton
+            android:id="@+id/radioSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="small"
+            android:onClick="onSizeClicked"/>
+
+        <RadioButton
+            android:id="@+id/radioLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="large"
+            android:onClick="onSizeClicked"/>
+    </RadioGroup>
+
+
+</android.support.design.widget.CoordinatorLayout>
