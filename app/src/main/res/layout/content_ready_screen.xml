@@ -16,14 +16,32 @@
     android:clickable="true"
     -->
     <TextView
-        android:id="@+id/Text"
+        android:id="@+id/set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="90dp"
-        android:layout_marginTop="134dp"
-        android:text="Ready Screen" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Rotate Screen to Landscape Mode"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/begin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/set"
+        android:text="Press the arrow to begin"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/ready"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/set"
+        android:text="Get Ready"
+        android:textSize="24sp" />
+
 
     <!--<android.support.design.widget.FloatingActionButton-->
     <!--android:id="@+id/fab"-->

@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
+/**
+ * First Screen the user sees when they open our application
+ */
 public class WelcomeScreen extends AppCompatActivity {
 
     protected String layout;
@@ -23,21 +26,22 @@ public class WelcomeScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Button to continue to the next screen. In this case, the READY Screen.
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 EditText nameEdit = (EditText) findViewById(R.id.editText);
                 EditText condEdit = (EditText) findViewById(R.id.editCond);
                 EditText stageEdit = (EditText) findViewById(R.id.editStage);
                 EditText visitEdit = (EditText) findViewById(R.id.editVisit);
 
-//
-//                Snackbar.make(view, "Replace with your own action" + nameEdit.getText(), Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
+                /*
+                 * Basically, just want to make sure all of the entered data is viable.
+                 * If anything doesnt seem right, it will let the user know via toast
+                 * so they can fix it before continuing onto the next screen.
+                 */
 
                 Intent i = new Intent(WelcomeScreen.this, ReadyScreen.class); ////////////////////////this is how you do the new thing
                 i.putExtra("name", nameEdit.getText().toString());
@@ -74,15 +78,10 @@ public class WelcomeScreen extends AppCompatActivity {
                     i.putExtra("size",size);
                 }
 
-
+                //final check
                 if (layout != null && size != null && (cond.equals("TESTR") || cond.equals("TESTL") || cond.equals("ARSH")) ) {
                     startActivity(i);
                 }
-
-
-                //Log.d("editText", " is : " + nameEdit.getText());
-
-
             }
         });
     }

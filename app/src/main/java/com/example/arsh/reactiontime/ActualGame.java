@@ -22,10 +22,12 @@ import java.io.IOException;
 import static android.widget.RelativeLayout.CENTER_VERTICAL;
 import static java.util.Arrays.fill;
 
+/**
+ * This class runs the heart of the application, the reaction time game.
+ */
 public class ActualGame extends AppCompatActivity {
 
-
-    // Storage Permissions
+    // Storage Permissions (so that we can save file)
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -41,11 +43,8 @@ public class ActualGame extends AppCompatActivity {
     private long[] reactionTimes; // array of the reaction times. where at each index -- starting with 0 and ending at trials - 1
     private String[] bad;
     private String error = "";
-
-
     private String name, cond, stage;
     private int visit;
-
     private int runs = 15;
 
     //initialize basic vars
@@ -54,15 +53,14 @@ public class ActualGame extends AppCompatActivity {
     //initialize array vars
     long[] avgSeqReaction = new long[runs];
     double[] avgSecAccuracy = new double[runs];
-
+    //initialize aggregate data variables
     long randFirstAvg = 0L;// = Math.round(endSum/(double)50);
     double randFirstAcc = 0.0; // = Math.round((50 - endBad)/(double)50); /// how to calc the accuracy
-
     long randLastAvg = 0L;// = Math.round(endSum/(double)50);
     double randLastAcc = 0.0; // = Math.round((50 - endBad)/(double)50); /// how to calc the accuracy
-
     long avgReaction = 0L;// = Math.round(totalSum/(double)sequence.length());
     double avgAccuracy = 0.0;// = (double)Math.round((sequence.length() - totalBad)/(double)sequence.length());
+
 
     private double interrupted = -1.0; //-1 if never interruped. if interruped then count.
 
@@ -70,10 +68,12 @@ public class ActualGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actual_game);
+        //attempted to get rid of or hide purple toolbar: unsuccessful
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setBackgroundColor(Color.BLACK);
 //        setSupportActionBar(toolbar);
-            //getWindow().setStatusBarColor(Color.BLACK);
-
+//        getWindow().setNavigationBarColor(Color.BLACK);
+//        getWindow().setStatusBarColor(Color.BLACK);
 
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -85,7 +85,6 @@ public class ActualGame extends AppCompatActivity {
         // This work only for android 4.4+
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT)
         {
-
             getWindow().getDecorView().setSystemUiVisibility(flags);
 
             // Code below is to handle presses of Volume up or Volume down.
@@ -95,7 +94,6 @@ public class ActualGame extends AppCompatActivity {
             decorView
                     .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
                     {
-
                         @Override
                         public void onSystemUiVisibilityChange(int visibility)
                         {
@@ -107,14 +105,11 @@ public class ActualGame extends AppCompatActivity {
                     });
         }
 
-
+        //Press the Save button at any time to save and exit the program.
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent i = new Intent(ActualGame.this, fullscreen.class);
-//                startActivity(i);
-
                 interrupted = (double) count; //interrupted will equal the number of keys that have been pressed
                 count = sequence.length() - 1; //in order to end and write files and stufff
                 next();
@@ -122,9 +117,7 @@ public class ActualGame extends AppCompatActivity {
         });
 
         Bundle extras = getIntent().getExtras();
-
         String layout, size;
-
         if(extras != null)
         {
             name = extras.getString("name");
@@ -141,27 +134,9 @@ public class ActualGame extends AppCompatActivity {
             cond = "default";
             layout = "row";
             size = "small";
-
         }
 
-//        View decorView = getWindow().getDecorView();
-// Hide both the navigation bar and the status bar.
-// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-// a general rule, you should design your app to hide the status bar whenever you
-// hide the navigation bar.
-//        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                | View.SYSTEM_UI_FLAG_FULLSCREEN;
-//        decorView.setSystemUiVisibility(View.GONE);
-//        decorView.setVisibility(View.GONE);
-//
-//
-//        //may not need rest of the stuff
-////                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-////                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-////
-//        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
-        //MUST INITIALIZE BEFORE USING B1..B4
+        //MUST INITIALIZE BEFORE USING rectangles B1 to B4
         initializeButtons();
 
         if (size.equals("small") && layout.equals("row")) {
@@ -278,14 +253,6 @@ public class ActualGame extends AppCompatActivity {
             b4.setLayoutParams(params4);
 
         }
-        //THIS
-        //sequence = seq;
-
-//        Toast.makeText(this, sequence, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, sequence.length() + "", Toast.LENGTH_SHORT).show();
-
-        //OR THIS
-//
 
         if (cond.equals("TESTR") || cond.equals("TESTL")) {
             sequence = sequence + "24132413412432431243124132432412432134231241324321";
@@ -302,9 +269,9 @@ public class ActualGame extends AppCompatActivity {
                 + "111111111111" + "111111111111" + "111111111111"
                 + "11111111111111111111111111111111111111111111111111";
         } else {
+            //Note: should not reach here. but just in case.
             Toast.makeText(this, "Please Restart and Try Again", Toast.LENGTH_SHORT).show();
         }
-
 
 
         onset = new long[sequence.length()];
@@ -320,7 +287,7 @@ public class ActualGame extends AppCompatActivity {
         fill(avgSecAccuracy, 0);
 
 
-        //following necessary?
+        //following necessary? I don't think so
 //        for (int x = 0; x < sequence.length(); x++) {
 //            bad[x] = "";
 //        }
@@ -340,7 +307,7 @@ public class ActualGame extends AppCompatActivity {
         //for (int x = 0; x < sequence.length(); x++) {
         final Button curButton = getButton(sequence.charAt(count));
         turnBlue(curButton);
-        onset[count] = System.currentTimeMillis();
+        onset[count] = System.currentTimeMillis(); //starts timer as soon as it turns blue
         //bad[count] = ""; //initialize
 
         //start timer for measuring reaction time
@@ -374,38 +341,15 @@ public class ActualGame extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                offset[count] = System.currentTimeMillis();
-                reactionTimes[count] = offset[count] - onset[count];
-
-//                Snackbar.make(view, "curButton pressed", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
-                //Log.d(curButton.getText().toString(),bad[count]);
+                offset[count] = System.currentTimeMillis(); //ends timer as soon as correct button is pressed
+                reactionTimes[count] = offset[count] - onset[count]; //records reaction time
                 makeAllWhite();
-                next(); //do NOT use count after this.
+                next(); //do NOT use count after this. because it increases count
 
             }
         });
 
-        //other onclick listeners to record bad ones?
-
-        //get this to work more
-        //then write to files
-
-
-
-//            Log.d("hey", "i've arrived");
-//            while (pressed == 0) {
-//                onClick();
-//            }
-            //pressed = 0;
-
-            //Log.d("hey", "i've arrived");
-            //curButton.setBackgroundColor(Color.WHITE);
-
             //wait for press
-        //}
-
     }
 
     /**
@@ -432,22 +376,26 @@ public class ActualGame extends AppCompatActivity {
         }
     }
 
+    /**
+     * Writes all the files the master and the individual files on the device.
+     */
     private void writeAll() {
 
-        //verifyStoragePermissions(this); // is this necessary???
+        //verifyStoragePermissions(this); // is this necessary??? no? but should do?
         String path =
                 Environment.getExternalStorageDirectory() + File.separator + "ReactionTime" + File.separator;
-        //Environment.getExternalStorageDirectory() + File.separator  + "ReactionTime"; //phone
+        //Environment.getExternalStorageDirectory() + File.separator  + "ReactionTime"; //phone??
 
-        // Create the ReactionTime folder. (will be in same dirrectory as documents folder)
+        // Create the ReactionTime folder. (will be in same directory as documents folder)
         File folder = new File(path);
         folder.mkdirs();
         try
         {
-            /**
-             * STUFF FOR MASTER FILE FOLLOWS:
+            /*
+             * SAVING TO MASTER FILE HERE:
              */
-            // Create the srtt.txt file.
+
+            // Create the srtt.txt file. (master file) only appends aggregate data
             final File file = new File(folder, "SRTT.txt");
             FileWriter myOutWriter = new FileWriter(file, true); //append = true.
             writeBlocks(myOutWriter); //to master
@@ -460,11 +408,14 @@ public class ActualGame extends AppCompatActivity {
 
         }
 
+        /*
+         * SAVING TO INDIVIDUAL FILE HERE:
+         */
         String indivFileName = name + ".txt";
         try {
             final File indiv = new File(folder, indivFileName);
-            writeBlocks(new FileWriter(indiv, true)); //to indiv
-            writeIndivs(new FileWriter(indiv, true));
+            writeBlocks(new FileWriter(indiv, true)); //aggregate
+            writeIndivs(new FileWriter(indiv, true)); //individual data elements
         } catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
             error = "indiv file append failed. " + name;
@@ -509,6 +460,9 @@ public class ActualGame extends AppCompatActivity {
     }
 
 
+    /**
+     * Aggregate data calculator
+     */
     private void calculateSegments() {
 
         if (interrupted == -1) {
@@ -558,7 +512,7 @@ public class ActualGame extends AppCompatActivity {
         } else { //interrupted
 
 
-            //beginging 50
+            //beginging 50 block
             double end = 0.0;
             if (interrupted > 50.0) {
                 end = 50.0;
@@ -573,7 +527,7 @@ public class ActualGame extends AppCompatActivity {
             randFirstAcc = Math.round((100.0 * (end - begBad) / end)) / 100.0; /// how to calc the accuracy
 
 
-            //sequences (15 runs)
+            //sequences (15 runs). Each run is a block.
             for (int x = 0; x < runs; x++) {
                 if (interrupted > 50 + x*seq.length()) {
 
@@ -596,7 +550,7 @@ public class ActualGame extends AppCompatActivity {
                 }
             }
 
-            //last 50
+            //last 50 block
             if (interrupted > 50 + runs*seq.length()) {
 
                 end = interrupted - 50.0 - (double)(runs*seq.length());
