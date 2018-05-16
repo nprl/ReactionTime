@@ -2,34 +2,25 @@ package com.example.arsh.reactiontime;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
-import static android.widget.RelativeLayout.ALIGN_TOP;
 import static android.widget.RelativeLayout.CENTER_VERTICAL;
+import static java.util.Arrays.fill;
 
 public class ActualGame extends AppCompatActivity {
 
@@ -44,12 +35,13 @@ public class ActualGame extends AppCompatActivity {
     Button b1, b2, b3, b4;
     String seq = "423142124323";
     String sequence = "";
-    int pressed = 0;
     int count = 0;
     private long[] onset; //array of the onsets of the time when the rectangle changes color
     private long[] offset; //arrry of the offsets of the time when the user presses the key
     private long[] reactionTimes; // array of the reaction times. where at each index -- starting with 0 and ending at trials - 1
     private String[] bad;
+    private String error = "";
+
 
     private String name, cond, stage;
     private int visit;
@@ -71,6 +63,8 @@ public class ActualGame extends AppCompatActivity {
 
     long avgReaction = 0L;// = Math.round(totalSum/(double)sequence.length());
     double avgAccuracy = 0.0;// = (double)Math.round((sequence.length() - totalBad)/(double)sequence.length());
+
+    private double interrupted = -1.0; //-1 if never interruped. if interruped then count.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,9 +115,9 @@ public class ActualGame extends AppCompatActivity {
 //                Intent i = new Intent(ActualGame.this, fullscreen.class);
 //                startActivity(i);
 
-                Snackbar.make(view, "button was pressed", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
+                interrupted = (double) count; //interrupted will equal the number of keys that have been pressed
+                count = sequence.length() - 1; //in order to end and write files and stufff
+                next();
             }
         });
 
@@ -318,6 +312,13 @@ public class ActualGame extends AppCompatActivity {
         reactionTimes = new long[sequence.length()];
         bad = new String[sequence.length()];
 
+        fill(onset, 0);
+        fill(offset, 0);
+        fill(reactionTimes, 0);
+        fill(bad, "");
+        fill(avgSeqReaction, 0);
+        fill(avgSecAccuracy, 0);
+
 
         //following necessary?
 //        for (int x = 0; x < sequence.length(); x++) {
@@ -340,7 +341,7 @@ public class ActualGame extends AppCompatActivity {
         final Button curButton = getButton(sequence.charAt(count));
         turnBlue(curButton);
         onset[count] = System.currentTimeMillis();
-        bad[count] = ""; //initialize
+        //bad[count] = ""; //initialize
 
         //start timer for measuring reaction time
 
@@ -455,14 +456,18 @@ public class ActualGame extends AppCompatActivity {
         catch (IOException e)
         {
             Log.e("Exception", "File write failed: " + e.toString());
+            error = "master file append failed";
+
         }
 
+        String indivFileName = name + ".txt";
         try {
-            final File indiv = new File(folder, name + ".txt");
+            final File indiv = new File(folder, indivFileName);
             writeBlocks(new FileWriter(indiv, true)); //to indiv
             writeIndivs(new FileWriter(indiv, true));
         } catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
+            error = "indiv file append failed. " + name;
         }
     }
 
@@ -506,50 +511,114 @@ public class ActualGame extends AppCompatActivity {
 
     private void calculateSegments() {
 
+        if (interrupted == -1) {
 
-
-        //beginging 50
-        for(int x = 0; x < 50; x++) {
-            begSum += reactionTimes[x];
-            begBad += bad[x].length();
-        }
-
-        randFirstAvg = Math.round(begSum/(double)50);
-        randFirstAcc = Math.round((100.0 * (50.0 - begBad)/50.0))/100.0; /// how to calc the accuracy
-
-        //sequences (15 runs)
-//
-        for (int x = 0; x < runs; x++) {
-            long seqSum = 0L;
-            int seqBad = 0;
-            for (int y = 0; y < seq.length(); y++) {
-                seqSum += reactionTimes[50 + (seq.length()*x) + y];
-                seqBad += bad[50 + (seq.length()*x) + y].length();
+            //beginging 50
+            for (int x = 0; x < 50; x++) {
+                begSum += reactionTimes[x];
+                begBad += bad[x].length();
             }
-            avgSeqReaction[x] = Math.round(seqSum/(double)seq.length());
-            avgSecAccuracy[x] = Math.round(100.0* ((seq.length() - seqBad)/(double)seq.length()))/100.0;
 
-            totalSum += seqSum;
-            totalBad += seqBad;
+            randFirstAvg = Math.round(begSum / (double) 50);
+            randFirstAcc = Math.round((100.0 * (50.0 - begBad) / 50.0)) / 100.0; /// how to calc the accuracy
+
+            //sequences (15 runs)
+            for (int x = 0; x < runs; x++) {
+                long seqSum = 0L;
+                int seqBad = 0;
+                for (int y = 0; y < seq.length(); y++) {
+                    seqSum += reactionTimes[50 + (seq.length() * x) + y];
+                    seqBad += bad[50 + (seq.length() * x) + y].length();
+                }
+                avgSeqReaction[x] = Math.round(seqSum / (double) seq.length());
+                avgSecAccuracy[x] = Math.round(100.0 * ((seq.length() - seqBad) / (double) seq.length())) / 100.0;
+
+                totalSum += seqSum;
+                totalBad += seqBad;
+            }
+
+            //last 50
+            for (int x = 0; x < 50; x++) {
+                endSum += reactionTimes[50 + runs * seq.length() + x];
+                endBad += bad[50 + runs * seq.length() + x].length();
+            }
+
+            randLastAvg = Math.round(endSum / (double) 50);
+            randLastAcc = Math.round(100.0 * ((50 - endBad) / (double) 50)) / 100.0; /// how to calc the accuracy
+
+
+            //overall
+            totalSum += begSum + endSum;
+            totalBad += begBad + endBad;
+
+            avgReaction = Math.round(totalSum / (double) sequence.length());
+            avgAccuracy = Math.round(100.0 * ((sequence.length() - totalBad) / (double) sequence.length())) / 100.0;
+
+
+        } else { //interrupted
+
+
+            //beginging 50
+            double end = 0.0;
+            if (interrupted > 50.0) {
+                end = 50.0;
+            } else {
+                end = interrupted;
+            }
+            for (int x = 0; x < end; x++) {
+                begSum += reactionTimes[x];
+                begBad += bad[x].length();
+            }
+            randFirstAvg = Math.round(begSum / end);
+            randFirstAcc = Math.round((100.0 * (end - begBad) / end)) / 100.0; /// how to calc the accuracy
+
+
+            //sequences (15 runs)
+            for (int x = 0; x < runs; x++) {
+                if (interrupted > 50 + x*seq.length()) {
+
+                    if(interrupted >= 50 + (x+1)*seq.length()) {
+                        end = seq.length();
+                    } else {
+                        end = interrupted - 50 - (x*seq.length());
+                    }
+                    long seqSum = 0L;
+                    int seqBad = 0;
+                    for (int y = 0; y < end; y++) {
+                        seqSum += reactionTimes[50 + (seq.length() * x) + y];
+                        seqBad += bad[50 + (seq.length() * x) + y].length();
+                    }
+                    avgSeqReaction[x] = Math.round(seqSum / end);
+                    avgSecAccuracy[x] = Math.round(100.0 * ((end - seqBad) / end)) / 100.0;
+
+                    totalSum += seqSum;
+                    totalBad += seqBad;
+                }
+            }
+
+            //last 50
+            if (interrupted > 50 + runs*seq.length()) {
+
+                end = interrupted - 50.0 - (double)(runs*seq.length());
+
+                for (int x = 0; x < end; x++) {
+                    endSum += reactionTimes[50 + runs * seq.length() + x];
+                    endBad += bad[50 + runs * seq.length() + x].length();
+                }
+
+                randLastAvg = Math.round(endSum / end);
+                randLastAcc = Math.round(100.0 * ((end - endBad) / end)) / 100.0; /// how to calc the accuracy
+            }
+
+            //overall
+            totalSum += begSum + endSum;
+            totalBad += begBad + endBad;
+
+            avgReaction = Math.round(totalSum / interrupted);
+            avgAccuracy = Math.round(100.0 * ((interrupted - totalBad) / interrupted)) / 100.0;
+
+
         }
-
-        //last 50
-        for(int x = 0 ; x < 50; x++) {
-            endSum += reactionTimes[50 + runs*seq.length() + x];
-            endBad += bad[50 + runs*seq.length() + x].length();
-        }
-
-        randLastAvg = Math.round(endSum/(double)50);
-        randLastAcc = Math.round(100.0* ((50 - endBad)/(double)50))/100.0; /// how to calc the accuracy
-
-
-        //overall
-        totalSum += begSum + endSum;
-        totalBad += begBad + endBad;
-
-        avgReaction = Math.round(totalSum/(double)sequence.length());
-        avgAccuracy = Math.round(100.0 * ((sequence.length() - totalBad)/(double)sequence.length()))/100.0;
-
 
     }
 

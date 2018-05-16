@@ -6,10 +6,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -44,7 +43,7 @@ public class WelcomeScreen extends AppCompatActivity {
                 i.putExtra("name", nameEdit.getText().toString());
 
                 String cond = condEdit.getText().toString(); //condEdit.getText().toString()
-                if (cond.equals("TESTR") || cond.equals("TESTL")) {
+                if (cond.equals("TESTR") || cond.equals("TESTL") || cond.equals("ARSH")) {
                     i.putExtra("cond", cond);
                 } else {
                     Snackbar.make(view, "cond should be TESTR or TESTL", Snackbar.LENGTH_LONG)
@@ -76,7 +75,7 @@ public class WelcomeScreen extends AppCompatActivity {
                 }
 
 
-                if (layout != null && size != null && (cond.equals("TESTR") || cond.equals("TESTL")) ) {
+                if (layout != null && size != null && (cond.equals("TESTR") || cond.equals("TESTL") || cond.equals("ARSH")) ) {
                     startActivity(i);
                 }
 
